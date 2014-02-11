@@ -1,4 +1,4 @@
-var score = 0;
+var score = 0.0;
 var currentLetter = "";
 //var words = ["Ryan", "Two"];
 var words;
@@ -16,7 +16,11 @@ document.getElementById('nextword').innerHTML = words[1];
 document.addEventListener('keydown', function(event) {
 	// Add to the var 'currentWord' the current pressed key
 	currentLetter = String.fromCharCode(event.keyCode);
-	
+
+	if(event.keyCode == 32) { // Space
+		console.log("PAUSE");
+	}
+
 	if (letterToType.toUpperCase() == currentLetter) {
 		
 		
@@ -57,34 +61,30 @@ document.addEventListener('keydown', function(event) {
 		}
 	} else {
 		// Typed incorrect letter
-		score -= 1;
+		score -= 0.1;
+		// Since 0.1 isn't actually 0.1, we need to round it
+		score = Math.round(score * 100) / 100;
 		document.getElementById('score').innerHTML = score;
 	}
 });
 
 function getWords() {
 	request = new XMLHttpRequest;
-	request.open('GET', 'words.php?difficulty=easy&wordcount=20', false); // Must be false
+	// Difficulty starts at 2
+	request.open('GET', 'words.php?difficulty=2', false); // Must be false
     
 	request.onload = function() {
 		if(request.status >= 200 && request.status < 400) {
 			// It worked.
-			//console.log("it worked");
-			//data = JSON.parse(request.responseText);
-			//var data = request.responseText;
 			data = JSON.parse(request.responseText);
 			handleResponse(data);
-			//console.log(data);
-			//return data;
 		} else {
 			console.log("An error occurred");
 		}
 	}
-	//request.onerror = function() {
-		// There was a connection error of some sort
-	//}
 	request.send();
 }
+
 function handleResponse (response) {
    words = response; 
 }
