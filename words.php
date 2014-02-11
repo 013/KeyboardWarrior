@@ -1,36 +1,30 @@
 <?php
-//http://stackoverflow.com/questions/4329396/mysql-select-10-random-rows-from-600k-rows-fast
-$difficulty = htmlentities($_GET['difficulty']);
-$wordcount = (int) $_GET['wordcount'];
+//$difficulty = htmlentities($_GET['difficulty']);
+//$wordcount = (int) $_GET['wordcount'];
+try {
+	$db = new PDO('mysql:host=localhost;dbname=words', 'username', 'password');
+} catch (PDOException $exception) {
+	die();
+}
 
-//$sql = "SELECT word FROM words WHERE"
-/*
-switch ($difficulty) {
-	case 'easy':
-		$sql .= "length < 10";
-		break;
-	case 'medium':
-		$sql .= "length < 15";
-		break;
-	case 'hard':
-		$sql .= "length < 20";
-		break;
-	default:
-		break;
-}*/
+$st = $db->query('SELECT count(*) FROM words;');
+$row = $st->fetch(PDO::FETCH_NUM);
+$num_of_words = $row[0];
+$ids = array();
 
-$sql = "
-SELECT word
-	FROM random AS r1 JOIN
-		(SELECT (RAND() *
-			(SELECT MAX(id)
-			FROM random)) AS id)
-		AS r2
-	WHERE r1.id >= r2.id
-	ORDER BY r1.id ASC
-	LIMIT 10";
+for ($i=0;$i<$num_of_words;$i++) {
+	array_push($ids, mt_rand(0, $num_of_words));
+}
 
-$words = array("One", "Two", "Three", "Four", "Five");
+$id = implode(',', $ids);
+$query = "SELECT word FROM words WHERE id IN ($id) LIMIT 10";
+$st = $db->prepare($query);
+$st->execute();
+
+$words = array();
+while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
+	array_push($words, $row["word"]);
+}
 
 echo json_encode($words);
 
