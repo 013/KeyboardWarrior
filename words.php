@@ -3,7 +3,7 @@ $difficulty = ((int) $_GET['difficulty']) * 5;
 try {
 	$db = new PDO('mysql:host=localhost;dbname=words', 'username', 'password');
 } catch (PDOException $exception) {
-	die();
+	die("Error connecting to database");
 }
 
 $st = $db->query('SELECT count(*) FROM words;');
