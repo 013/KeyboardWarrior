@@ -1,21 +1,18 @@
-var score = 0.0;
-var currentLetter = "";
-var words = [];
-getWords(); // Populates 'words'
-// Get first word
-var wordToType = words[0]
-var letterPlace = 0;
-var wordPlace = 0;
-var letterToType = wordToType[letterPlace]; //words[0][0]
-var angle = Math.floor(Math.random()*(61 - -60 +1)+ -61);
-var z=0;
-var canvas = document.getElementById("moving");
-var context = canvas.getContext("2d");
-
-var correct;
-
+var score          = 0.0;
+var currentLetter  = "";
+var words          = [];
+getWords(false);  // Populates  'words'
+var wordToType     = words[0]
+var letterPlace    = 0;
+var wordPlace      = 0;
+var letterToType   = wordToType[letterPlace];            //words[0][0]
+var angle          = Math.floor(Math.random()*(61 - -60 +1)+ -61);
+var z              = 0;
+var canvas         = document.getElementById("moving");
+var context        = canvas.getContext("2d");
 var now, delta;
-var then = new Date().getTime();
+var then           = new Date().getTime();
+var correct;
 
 window.requestAnim = function() {
 	return window.requestAnimationFrame ||
@@ -40,9 +37,13 @@ function move() {
 	context.font = "24px monospace";
 	z+=calcSpeed(delta, 1);
 	context.translate(canvas.width / 2, 20+z);
-	if (angle > -80) {
-		angle -= 2;
+	if(canvas.height < z) {
+		console.log("Off screen");
 	}
+	//console.log(canvas.height, z);
+	//if (angle > -80) {
+	//	angle -= 2;
+	//}
 	context.rotate(angle*Math.PI / 180);
 	context.save();
 	for (var i=0; i<=wordToType.length; ++i) {
@@ -116,6 +117,7 @@ document.addEventListener('keydown', function(event) {
 				// Reset some variables
 				wordPlace += 1;
 				
+				angle = Math.floor(Math.random()*(61 - -60 +1)+ -61);
 				wordToType = words[wordPlace];
 				
 				// if need new words, get them
@@ -141,10 +143,10 @@ document.addEventListener('keydown', function(event) {
 	}
 });
 
-function getWords() {
+function getWords(async=true) {
 	request = new XMLHttpRequest;
 	// Difficulty starts at 2
-	request.open('GET', 'words.php?difficulty=2', false); // Must be false
+	request.open('GET', 'words.php?difficulty=2', async);
     
 	request.onload = function() {
 		if(request.status >= 200 && request.status < 400) {
