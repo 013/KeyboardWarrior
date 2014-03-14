@@ -1,19 +1,19 @@
-var score          = 0.0;
-var currentLetter  = "";
 var words          = [];
 getWords(false);  // Populates  'words'
+var score          = 0.0;
+var currentLetter  = "";
 var wordToType     = words[0]
 var letterPlace    = 0;
 var wordPlace      = 0;
 var letterToType   = wordToType[letterPlace]; //words[0][0]
 var angle          = Math.floor(Math.random()*(61 - -60 +1)+ -61);
 var z              = 0;
+var pause          = false;
 var canvas         = document.getElementById("moving");
 var context        = canvas.getContext("2d");
 var now, delta;
 var then           = new Date().getTime();
 var correct;
-var pause = false;
 
 var startingX = 0;//Math.floor(Math.random()*(window.innerWidth/2 - (window.innerWidth/2-window.innerWidth))+ (window.innerWidth/2-window.innerWidth));
 var x = startingX;//Math.floor(Math.random()*(50 - -50 +1)+ -50);
@@ -31,26 +31,33 @@ window.requestAnim = function() {
 }();
 
 function move() {
-	if (pause == true) { return 0; }
 	x=startingX;
 	now = new Date().getTime();
 	delta = now-then;
-	//console.log(delta);
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	
+	if (pause == true) { 
+		context.font = "24px monospace";
+		context.strokeStyle = "rgb(255,0,0)";
+		context.strokeText("Paused", window.innerWidth/2,window.innerHeight/2);
+	} else {
+		z+=calcSpeed(delta, .1);
+	}
+	
 	context.font = "24px monospace";
-	context.fillText("Score: "+score, 10,window.innerHeight-10);
-	z+=calcSpeed(delta, 1);
+	
+	context.fillText("Score: "+
+		score+
+		"\tNext Word: "+
+		words[wordPlace+1]
+		, 10,window.innerHeight-10);
+
 	context.translate(canvas.width / 2, 20+z);
 	if(canvas.height < z) {
 		console.log("Off screen");
 		newWord(false);
 	}
-	//console.log(canvas.height, z);
-	//if (angle > -80) {
-	//	angle -= 2;
-	//}
 	context.rotate(angle*Math.PI / 180);
 	context.save();
 	for (var i=0; i<=wordToType.length; ++i) {
@@ -101,24 +108,6 @@ function newWord(correct=true) {
 	letterToType = wordToType[letterPlace];
 }
 
-function nextword(word) {
-	// Don't need this function anymore
-	return 0;
-	var canvas = document.getElementById("nextword");
-	var context = canvas.getContext("2d");
-	var x = 60;
-	var y = 15;
-	canvas.width = 120;
-	canvas.height = 20;
-	
-	context.font = "12px monospace";
-	context.textAlign = "center";
-
-	context.fillText(word, x, y);
-}
-
-//nextword(words[1]);
-
 document.addEventListener('keydown', function(event) {
 	// Add to the var 'currentWord' the current pressed key
 	currentLetter = String.fromCharCode(event.keyCode);
@@ -130,7 +119,6 @@ document.addEventListener('keydown', function(event) {
 		} else {
 			pause = true;
 		}
-		console.log("PAUSE");
 	}
 
 	if (pause == true) { return 0; }
@@ -138,7 +126,6 @@ document.addEventListener('keydown', function(event) {
 	// A - Z	
 	if (event.keyCode >= 65 && event.keyCode <= 90) {
 		if (letterToType.toUpperCase() == currentLetter) {
-			//console.log(letterToType);
 			letterPlace += 1;
 			letterToType = wordToType[letterPlace];
 			
@@ -153,9 +140,7 @@ document.addEventListener('keydown', function(event) {
 			score -= 0.1;
 			// Since 0.1 isn't actually 0.1, we need to round it
 			score = Math.round(score * 100) / 100;
-			//document.getElementById('score').innerHTML = score;
 			correct = false;
-			//redraw(wordToType, letterPlace, false);
 		}
 	}
 });
