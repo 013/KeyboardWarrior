@@ -1,7 +1,7 @@
 <?php
 $difficulty = ((int) $_GET['difficulty']) * 5;
 try {
-	$db = new PDO('mysql:host=localhost;dbname=words', 'root', 'linnit');
+	$db = new PDO('mysql:host=localhost;dbname=words', 'username', 'password');
 } catch (PDOException $exception) {
 	die("Error connecting to database");
 }
